@@ -1,0 +1,16 @@
+{% extends 'matching/base.html' %}
+
+{% block content %}
+TOP画面です
+
+<input type="button" onclick="location.href='/login'" value="ログイン画面">
+{{obj}}<br>
+{{error}}<br>
+{% for key, value in data.items%}
+    pk = {{value.pk}}<br>
+    user_id = {{value.user_id}}<br>
+    user_name = {{value.user_name}}<br>
+    user_password = {{value.user_password}}<br>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'matching/base.html' %}
+
+{% block content %}
+    アカウントを新規作成しました。<br>
+    {% comment %} {% for key, value in contents.items%}
+        <th>{{value}}</th>
+    {% endfor %} {% endcomment %}
+    登録されたデータ。<br>
+    {{id}}
+    <br>
+    {% for key, value in data.items%}
+        user_id = {{value.user_id}}<br>
+        user_name = {{value.user_name}}<br>
+        user_password = {{value.user_password}}<br>
+    {% endfor %}
+    <input type="button" onclick="location.href='/login'" value="ログイン画面">
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'matching/base.html' %}
+
+{% block content %}
+
+    {% comment %} <form action="{% url 'login_success' %}" method="post"> {% endcomment %}
+    <form action="/login_success/" method="post">
+    
+        {% for login1 in login %}
+            <div>
+                {% comment %} <p>user: {{ login1.user_id }}</p> {% endcomment %}
+                {% comment %} <p>name: {{ login1.user_name }}</p> {% endcomment %}
+            </div>
+        {% endfor %}
+        {% comment %} <br>
+        ユーザーID：<input type="text" id="id" name="user_id" required　minlength="4" maxlength="8" size="10">
+        <br>
+        パスワード：<input type="text" id="pass" name="user_password" required　minlength="4" maxlength="8" size="10">
+        <br> {% endcomment %}
+        
+        {{ form.as_p }}
+        <input type="submit" value="ログイン">
+        {% comment %} {{login.user_id}} {% endcomment %}
+        {% csrf_token %}
+        {% comment %} <h2><a href="{% url 'login_success' pk="1" %}">{{ login.user_id }}</a></h2> {% endcomment %}
+    </form>
+    <input type="button" onclick="location.href='/create_account'" value="アカウント作成"  name = "create">
+{% endblock %}
