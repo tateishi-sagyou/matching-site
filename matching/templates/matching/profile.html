@@ -1,0 +1,17 @@
+{% extends 'matching/base.html' %}
+{% load static %}
+{% block content %}
+
+    {% for value in image %}
+        <td><img src= {{ MEDIA_URL }}{{value.user_images}} width="100" height="100"/></td>
+    {% endfor %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+        ユーザー名：{{ form.user_name }}<br>
+        プロフィール：{{ form.user_profile }}<br>
+        {{ form.user_images }}
+        {% csrf_token %}
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+{% endblock %}

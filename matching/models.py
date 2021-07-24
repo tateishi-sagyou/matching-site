@@ -25,3 +25,14 @@ class User(models.Model):
 
     class Meta:
         verbose_name = "ユーザー"
+
+class UserDetail(models.Model):
+    user_id = models.CharField(verbose_name="ユーザーID",max_length=10,primary_key=True)
+    user_name = models.CharField(verbose_name="ユーザー名",max_length=10)
+    user_profile = models.TextField(verbose_name='プロフィール',max_length=100)
+    created_date = models.DateTimeField(default=timezone.now)
+
+class UserImage(models.Model):
+    user_id = models.CharField(verbose_name="ユーザーID",max_length=10)
+    user_images = models.ImageField(verbose_name = 'avator',upload_to='image/')
+    reated_date = models.DateTimeField(default=timezone.now)

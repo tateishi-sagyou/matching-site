@@ -1,10 +1,10 @@
 from django.http import request
 from django.shortcuts import render
-from .models import User
+from .models import User, UserDetail,UserImage
 from django.utils import timezone
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.views import generic
-from .forms import PostForm,LoginForm
+from .forms import PostForm,LoginForm,UpLoadProfileImgForm
 from django.urls import reverse_lazy
 
 model = User
@@ -74,6 +74,12 @@ class LoginSuccessView(generic.FormView):
                 #ログイン成功
                 #セッションにログイン情報を設定
                 request.session['user_id']=id
+
+                # クッキーに保存
+                template = 'matching/login.html'
+                context = {'data': data}
+                response = render(request, template, context)
+                response.set_cookie('key', 'value')
                 return render(request,'matching/login_success.html', {'data': data})
             else:
                 # ログイン失敗
@@ -106,79 +112,47 @@ class ChatView(generic.TemplateView):
             session_id = request.session.get('user_id')
             data = model.objects.get(user_id=session_id)
             return render(request,'matching/chat.html', {'data': data})
-            # return super().dispatch(request, *args, **kwargs)
             
 
-
-
-
-# *************************************************
-# これで一応動きます
-# *************************************************
-# class CreateAccountView (generic.FormView):
-#     form_class = PostForm      
-#     template_name = 'login/create_account.html'
-
-# class ExecCreateAccount (generic.CreateView):
-#     model = Login
-#     form_class = PostForm      
-#     template_name = 'login/create_account_success.html'
-
-# *************************************************
-
-    # success_url = 'login/create_account_success.html'
-
-    # def get_success_url(self,request):
-    #     id = self.object.id
-
-    #     return render(request, 'login/create_account_success.html',{
-    #         'id':id
-    #     }
-
-
-    # def get_success_url(self):
-        # return reverse('create_done', kwargs={'pk': self.object.id})
-
-
-    # success_url = reverse_lazy('login/create_account_success.html')
-    # def get_success_url(self):
-    #     return reverse('create_done1', kwargs={'pk': self.object.id})
-
-    # def execCreate(request):
-    #     id = request.POST.get('user_id')
-    #     password = request.POST.get('user_password')
-    #     return render(request, 'login/create_account_success.html',{
-    #         'id':id
-    #     })
-
-
-
-
-
-#  class CreateAccountView(generic.CreateView):
-#     form_class = PostForm
-#     template_name = 'login/create_account.html'
-#     # success_url = reverse_lazy('create_done')
-#     # success_url = '/login/create_account_success.html'  # 成功時にリダイレクトするURL
-#     success_url = reverse_lazy('create_done', kwargs={'pk': model.object.id})
-#     # def get_success_url(self):
-#     #     return reverse('create_done', kwargs={'pk': self.object.id})
-#     def get_success_url(self):
-#         data = self.object.id
-#         return render(request, 'login/create_account_success.html',{
-#             'data':data
-#         })
+class ProfileView(generic.FormView):
+    
+    def profile(request):
         
-    # def create_done(request, **kwargs):
-    #     contents = {}
-    #     for key, val in kwargs.items():
-    #         contents[key] = val
+        if request.method == 'POST':
+            form = UpLoadProfileImgForm(request.POST, request.FILES)
+        else:
+            form = UpLoadProfileImgForm()
+        
+        image_model = UserImage
+        session_id = request.session.get('user_id')
 
-    #     userinfoDetail = get_object_or_404(Login,pk=kwargs.get('pk'))
-    #     data = {
-    #         'userinfoDetail':userinfoDetail,
-    #     }
+        if form.is_valid():
+            avator = form.cleaned_data['user_images']
+            image = UserImage()
+            image.user_images = avator
+            image.user_id = session_id
+            image.save()
 
-    #     return render(request, 'login/create_account_success.html',{
-    #         'contents': contents ,'data':data
-    #     })
+            UserDetail.objects.update_or_create(
+                user_id = session_id,
+                defaults={
+                    "user_name": form.cleaned_data['user_name'], 
+                    "user_profile": form.cleaned_data['user_profile']  
+                }
+            )
+            
+        data = image_model.objects.filter(user_id=session_id)
+        return render(request, 'matching/profile.html', {'form': form ,'image':data})
+
+class UserListView(generic.TemplateView):
+
+    def display_list_view(request):
+
+        session_id = request.session.get('user_id')
+        user_detail_model = UserDetail
+        user_image_model = UserImage
+        detail_data = user_detail_model.objects.exclude(user_id=session_id)
+        len(detail_data)
+        image_data = user_image_model.objects.exclude(user_id=session_id)
+
+        return render(request, 'matching/user_list.html', {'detail': detail_data ,'image':image_data})

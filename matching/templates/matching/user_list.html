@@ -1,0 +1,26 @@
+{% extends 'matching/base.html' %}
+
+{% block content %}
+    <div>ユーザー一覧</div>
+    {% for det in detail %}
+        {{det.user_name}}
+        {{det.user_profile}}
+        {% for img in image %}
+            {% if det.user_id == img.user_id %}
+                <img src= {{ MEDIA_URL }}{{img.user_images}} width="100" height="100"/>
+            {% endif %}
+        {% endfor %}
+        </td>
+        {% comment %} <button type="submit" class="btn">いいねえ^^</button> {% endcomment %}
+        <input type="button" onclick="iine_btn()" value="いいねぇ^^">
+    {% endfor %}
+
+<script>
+    function iine_btn(){
+        console.log('Start');
+        xhr = new XMLHttpRequest();
+        xhr.open("POST", "/user_list", true);
+        xhr.send("aa");
+    }
+</script>
+{% endblock %}
