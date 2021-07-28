@@ -144,3 +144,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # 画像をdjango側で読み込むための設定
 MEDIA_URL = '/media/'
+
+# ログイン設定
+LOGIN_URL = '/login' 
+LOGIN_REDIRECT_URL = '/matching/login_success'
+LOGOUT_REDIRECT_URL='/login'

@@ -12,8 +12,8 @@
         </p>
         {{ form.as_p }}
         <input type="submit" value="login" class="login-submit">
+        <input type="button" onclick="location.href='/create_account'" value="create account"  name = "create" class="login-submit">
         {% csrf_token %}
     </form>
-    <input type="button" onclick="location.href='/create_account'" value="create account"  name = "create" class="login-submit">
     <div class="underlay-black"></div> 
 {% endblock %}

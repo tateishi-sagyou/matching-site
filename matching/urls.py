@@ -12,4 +12,7 @@ urlpatterns = [
     path('chat/' , views.ChatView.as_view() ,name = 'chat'),
     path('profile/' , views.ProfileView.profile ,name = 'profile'),
     path('user_list/' , views.UserListView.display_list_view ,name = 'user_list'),
-] 
+    path('ajax-number/' , views.UserListView.ajax_number ,name = 'ajax_number'),
+    path('like_list/',views.LikeListView.display_Like_list_view ,name = 'like_list'),
+    path('ajax-number/' , views.LikeListView.ajax_number ,name = 'ajax_number'),
+    ] 

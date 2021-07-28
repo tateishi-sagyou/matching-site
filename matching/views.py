@@ -1,12 +1,14 @@
 from django.http import request
 from django.shortcuts import render
-from .models import User, UserDetail,UserImage
+from .models import User, UserDetail,UserImage, UserLike
 from django.utils import timezone
 from django.shortcuts import render,redirect
 from django.views import generic
 from .forms import PostForm,LoginForm,UpLoadProfileImgForm
 from django.urls import reverse_lazy
-
+from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import(LoginView, LogoutView)
 model = User
 
 # トップ画面を表示
@@ -21,7 +23,7 @@ class TopView(generic.TemplateView):
         else:
             return render(request,'matching/top.html', {'error': "セッション無"})
 
-     
+
 # ログイン画面を表示
 class LoginView(generic.FormView):
     form_class = LoginForm
@@ -130,11 +132,12 @@ class ProfileView(generic.FormView):
             avator = form.cleaned_data['user_images']
             image = UserImage()
             image.user_images = avator
-            image.user_id = session_id
+            id = User.objects.get(user_id=session_id)
+            image.user_id = id
             image.save()
 
             UserDetail.objects.update_or_create(
-                user_id = session_id,
+                user_id = id,
                 defaults={
                     "user_name": form.cleaned_data['user_name'], 
                     "user_profile": form.cleaned_data['user_profile']  
@@ -152,7 +155,74 @@ class UserListView(generic.TemplateView):
         user_detail_model = UserDetail
         user_image_model = UserImage
         detail_data = user_detail_model.objects.exclude(user_id=session_id)
-        len(detail_data)
         image_data = user_image_model.objects.exclude(user_id=session_id)
+        
+        # 複合キー使い方
+        queryset = UserDetail.objects.all().select_related()
+        for obj in queryset:
+            print(obj.user_id.user_password) # これで普通にUserMasterのlast_nameが取得できる
 
         return render(request, 'matching/user_list.html', {'detail': detail_data ,'image':image_data})
+
+    def ajax_number(request):
+
+        user_like = UserLike()
+        user_id = request.session.get('user_id')
+        to_user_id = request.POST.get('user_id')
+        id = User.objects.get(user_id=user_id)
+        user_like.user_id = id
+        user_like.to_like_user_id = to_user_id
+        
+
+        user_like.save()
+
+        plus = 1 + 2
+        minus = 1 - 2
+        d = {
+            'plus': plus,
+            'minus': minus,
+        }
+        return JsonResponse(d)
+
+class LikeListView(generic.TemplateView):
+
+    def display_Like_list_view(request):
+
+        session_id = request.session.get('user_id')
+        user_like = UserLike
+
+        # マッチング成立したデータ
+        matching_data = ""
+        to_like_id_list = user_like.objects.filter(user_id=session_id).values("to_like_user_id")    
+        for to_like_id in to_like_id_list :
+            matching_data = user_like.objects.filter(user_id=to_like_id.get('to_like_user_id'),to_like_user_id=session_id)
+        
+        # 自分がいいねしたデータ
+        to_like_id_list = user_like.objects.filter(user_id=session_id)
+        # # 自分がいいねされたデータ
+        from_like_data = user_like.objects.filter(to_like_user_id=session_id)
+
+        return render(request, 'matching/like_list.html', 
+        {'to_like': to_like_id_list ,
+        'form_like':from_like_data,
+        'matching_data':matching_data,
+        'id' : session_id
+        })
+
+
+    def ajax_number(request):
+
+        user_like = UserLike()
+        user_id = request.session.get('user_id')
+        to_user_id = request.POST.get('user_id')
+        user_like.user_id = user_id
+        user_like.to_like_user_id = to_user_id
+        user_like.save()
+
+        plus = 1 + 2
+        minus = 1 - 2
+        d = {
+            'plus': plus,
+            'minus': minus,
+        }
+        return JsonResponse(d)

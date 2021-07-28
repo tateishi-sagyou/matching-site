@@ -1,12 +1,24 @@
 from django import forms
 
 from .models import User, UserDetail, UserImage
+from django.contrib.auth.forms import AuthenticationForm
 
 class PostForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('user_id', 'user_password','user_name')
+        fields = ('user_id', 'user_password')
+
+# class LoginForm(AuthenticationForm):
+#     """ログオンフォーム"""
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for field in self.fields.values():
+#             field.widget.attrs['class'] = 'myfieldclass'
+#             field.widget.attrs['placeholder'] = 'user_id'
+#             self.fields['user_id'].widget.attrs['class'] = 'myfieldclass'
+#             self.fields['user_password'].widget.attrs['class'] = 'myfieldclass'
+#             self.fields['user_id'].widget.attrs['class']
 
 class LoginForm(forms.ModelForm):
     

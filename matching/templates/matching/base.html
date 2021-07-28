@@ -4,16 +4,17 @@
         <title>ログイン画面</title>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="{% static 'js/jquery.vide.js' %}"></script>
+        <script src="{% static 'js/flipsnap.js' %}"></script>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     </head>
-    <body data-vide-bg="{% static 'video/drink' %}">
-        <div 
+    <body data-vide-bg="{% static 'video/run.mp4' %}">
+        {% comment %} <div 
             data-vide-bg="path/to/video" data-vide-options="loop: false, muted: false, position: 0% 0%">
-        </div>
-        <div class="page-header">
+        </div> {% endcomment %}
+        {% comment %} <div class="page-header">
             <h1><a href="/">ログイン画面</a></h1>
-        </div>
+        </div> {% endcomment %}
         <div class="content container">
             <div class="row">
                 <div class="col-md-8">

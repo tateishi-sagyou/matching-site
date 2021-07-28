@@ -1,26 +1,80 @@
 {% extends 'matching/base.html' %}
 
 {% block content %}
+
     <div>ユーザー一覧</div>
     {% for det in detail %}
-        {{det.user_name}}
-        {{det.user_profile}}
-        {% for img in image %}
-            {% if det.user_id == img.user_id %}
-                <img src= {{ MEDIA_URL }}{{img.user_images}} width="100" height="100"/>
-            {% endif %}
-        {% endfor %}
-        </td>
-        {% comment %} <button type="submit" class="btn">いいねえ^^</button> {% endcomment %}
-        <input type="button" onclick="iine_btn()" value="いいねぇ^^">
+        <form id="ajax_number" action="{% url 'ajax_number' %}" method="POST">
+            
+            {{det.user_name}}
+            {{det.user_profile}}
+            {% for img in image %}
+                {% if det.user_id.user_id == img.user_id %}
+                    <img src= {{ MEDIA_URL }}{{img.user_images}} width="100" height="100"/>
+                {% endif %}
+            {% endfor %}
+            </td>
+            {% comment %} <button type="submit" class="btn">いいねえ^^</button> {% endcomment %}
+            <input type="hidden" value = {{det.user_id.user_id}}  id="user_id">
+            <input type="submit" value="いいねぇ^^" class = "nice_btn">
+            <div class="result">
+        </form>
     {% endfor %}
 
 <script>
-    function iine_btn(){
-        console.log('Start');
-        xhr = new XMLHttpRequest();
-        xhr.open("POST", "/user_list", true);
-        xhr.send("aa");
+
+    window.onload = function() {
+        alert("ページが読み込まれました！");
+    };
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
+
+     var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    $('#ajax_number').on('submit', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            'url': '{% url "ajax_number" %}',
+            'type': 'POST',
+            'data': {
+                'user_id' : $('#user_id').val(),
+                'number1': 1,
+                'number2': 2
+            },
+            'dataType': 'json'
+        })
+        .done(function(response){
+            $('.nice_btn').val('いいねぇ＾＾済')
+            $('.nice_btn').prop('disabled', true);
+        });
+    });
 </script>
 {% endblock %}

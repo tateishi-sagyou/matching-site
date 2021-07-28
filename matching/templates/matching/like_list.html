@@ -1,0 +1,89 @@
+{% extends 'matching/base.html' %}
+
+{% block content %}
+いいね一覧画面です
+
+<input type="button" onclick="location.href='/login'" value="ログイン画面">
+<div>
+    マッチング済
+    {% for value in matching_data %}
+        {{value.user_id.user_id}}
+        {% comment %} {{value.to_like_user_id}} {% endcomment %}
+    {% endfor %}
+</div>
+<div>
+    いいねしてる人ー
+    {% for value in to_like %}
+        {{value.to_like_user_id}}
+    {% endfor %}
+</div>
+<div>
+    <form id="ajax_number" action="{% url 'ajax_number' %}" method="POST">
+        いいねされた人ー
+        {% for value in form_like %}
+            {{value.user_id.user_id}}
+            <input type="hidden" value = {{value.user_id.user_id}}  id="user_id">
+            {% comment %} {% if value.user_id.user_id == id %}
+                <input type="submit" value="いいねぇ^^済" class = "nice_btn" disabled>
+            {% else %} {% endcomment %}
+                <input type="submit" value="いいねぇ^^" class = "nice_btn"　>
+            {% comment %} {% endif %}  {% endcomment %}
+        {% endfor %}
+    </form>
+</div>
+
+<script>
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+     var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    $('#ajax_number').on('submit', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            'url': '{% url "ajax_number" %}',
+            'type': 'POST',
+            'data': {
+                'user_id' : $('#user_id').val(),
+                //'number1': $('#number1').val(),
+                //'number2': $('#number2').val(),
+                'number1': 1,
+                'number2': 2
+            },
+            'dataType': 'json'
+        })
+        .done(function(response){
+            $('.nice_btn').val('いいねぇ＾＾済')
+            $('.nice_btn').prop('disabled', true);
+        });
+    });
+</script>
+{% endblock %}
